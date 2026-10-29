@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 from urllib.parse import urljoin
 
-PAGE_URL = "https://dscc.gov.bd/pages/office-orders"
+PAGE_URL = "https://www.dscc.gov.bd/pages/office-orders"
 STATE_FILE = Path("state.json")
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
