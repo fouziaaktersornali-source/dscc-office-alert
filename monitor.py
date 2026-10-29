@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 from pathlib import Path
 from urllib.parse import urljoin
 
-PAGE_URL = "https://www.dscc.gov.bd/pages/office-orders"
+PAGE_URL = "https://dscc.gov.bd/pages/office-orders"
 STATE_FILE = Path("state.json")
 
 BOT_TOKEN = os.environ["TELEGRAM_BOT_TOKEN"]
@@ -18,8 +18,29 @@ HEADERS = {
 
 
 def get_orders():
-    response = requests.get(PAGE_URL, headers=HEADERS, timeout=30)
-    response.raise_for_status()
+    from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
+
+session = requests.Session()
+
+retry_strategy = Retry(
+    total=3,
+    connect=3,
+    read=2,
+    backoff_factor=2,
+    status_forcelist=[429, 500, 502, 503, 504],
+    allowed_methods=["GET"],
+)
+
+session.mount("https://", HTTPAdapter(max_retries=retry_strategy))
+
+response = session.get(
+    PAGE_URL,
+    headers=HEADERS,
+    timeout=(20, 45),
+)
+
+response.raise_for_status()
 
     soup = BeautifulSoup(response.text, "html.parser")
     table = soup.find("table")
